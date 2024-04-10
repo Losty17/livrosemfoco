@@ -1,4 +1,4 @@
-from auth.services.get_token import GetTokenService
+from authentication.services.get_token import GetTokenService
 from core.services.service_base import ServiceBase
 from django.contrib.auth.models import User
 
@@ -22,7 +22,6 @@ class RegisterUserService(ServiceBase):
             "id": user.id,
             "name": user.first_name,
             "email": user.email,
-            "phone": user.username,
             "token": token,
         }
 
@@ -31,7 +30,6 @@ class RegisterUserService(ServiceBase):
     def validate_data(self):
         self.name = self.data.get("name")
         self.email = self.data.get("email")
-        self.phone = self.data.get("phone")
         self.password = self.data.get("password")
 
         errors = []
@@ -40,9 +38,6 @@ class RegisterUserService(ServiceBase):
 
         if not self.email:
             errors.append("Email is required")
-
-        if not self.phone:
-            errors.append("Phone is required")
 
         if not self.password:
             errors.append("Password is required")

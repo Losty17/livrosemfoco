@@ -1,4 +1,4 @@
-from auth.models.sessions import Session
+from authentication.models.sessions import Session
 from core.services.service_base import ServiceBase
 from uuid import uuid4
 from django.contrib.auth.models import User
