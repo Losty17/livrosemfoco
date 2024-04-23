@@ -21,8 +21,8 @@ class GetTokenService(ServiceBase):
         return True, "Token generated successfully", token
 
     def validate_data(self):
-        self.email = self.data.get("email")
-        self.password = self.data.get("password")
+        self.email = self.data.get("email", None)
+        self.password = self.data.get("password", None)
 
         errors = []
         if not self.email:
@@ -32,7 +32,7 @@ class GetTokenService(ServiceBase):
             errors.append("Password is required")
 
         if errors:
-            raise ValueError(errors)
+            return False, ", ".join(errors), None
 
     def get_token(self):
         if not self.user:
