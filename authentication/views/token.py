@@ -5,12 +5,15 @@ from authentication.services.get_token import GetTokenService
 
 
 def get_token(request: HttpRequest):
-    # check if body is empty
     if not request.body:
-        return JsonResponse({"error": "Body is empty"}, status=200)
+        return JsonResponse({"error": "Body is empty"}, status=400)
 
     json_data = json.loads(request.body)
 
-    success, detail, token = GetTokenService(data=json_data).perform()
+    success, detail, result = GetTokenService(data=json_data).perform()
 
-    return JsonResponse({"success": success, "detail": detail, "token": token})
+    return JsonResponse({
+        "success": success,
+        "detail": detail,
+        **result
+    }, safe=False)
