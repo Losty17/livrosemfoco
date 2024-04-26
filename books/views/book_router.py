@@ -8,7 +8,12 @@ from books.services.upsert_book import UpsertBookService
 
 def book_router(request: HttpRequest):
     if request.method == "GET":
-        return ListBooksService().perform()
+        success, detail, json_data = ListBooksService().perform()
+
+        if success:
+            return JsonResponse({'detail': detail, 'books': json_data})
+        else:
+            return JsonResponse({'detail': detail}, status=400)
 
     if request.method == "POST":
         body = json.loads(request.body)
