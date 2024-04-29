@@ -1,13 +1,14 @@
+from django.http import HttpRequest
 import json
 from django.http import HttpRequest, HttpResponse, JsonResponse
 
-from books.services.list_books import ListBooksService
-from books.services.upsert_book import UpsertBookService
+from reviews.services.list_reviews import ListReviewsService
+from reviews.services.upsert_review import UpsertReviewService
 
 
-def book_router(request: HttpRequest):
+def review_router(request: HttpRequest):
     if request.method == "GET":
-        success, detail, json_data = ListBooksService().perform()
+        success, detail, json_data = ListReviewsService().perform()
 
         if success:
             return JsonResponse({"detail": detail, "books": json_data})
@@ -23,7 +24,7 @@ def book_router(request: HttpRequest):
         isbn = body.get("isbn")
         publisher = body.get("publisher")
 
-        success, detail, book = UpsertBookService(
+        success, detail, book = UpsertReviewService(
             title=title,
             author=author,
             publication_year=publication_year,

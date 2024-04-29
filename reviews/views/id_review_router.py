@@ -1,18 +1,16 @@
 import json
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import JsonResponse
+from reviews.services.delete_review import DeleteReviewService
+from reviews.services.get_review import GetReviewService
+from reviews.services.upsert_review import UpsertReviewService
 
-from books.services.list_books import ListBooksService
-from books.services.upsert_book import UpsertBookService
 
-
-def book_router(request: HttpRequest):
+def id_review_router(request, pk: int):
     if request.method == "GET":
-        success, detail, json_data = ListBooksService().perform()
+        return GetReviewService(id=pk).perform()
 
-        if success:
-            return JsonResponse({"detail": detail, "books": json_data})
-        else:
-            return JsonResponse({"detail": detail}, status=400)
+    if request.method == "DELETE":
+        return DeleteReviewService(id=pk).perform()
 
     if request.method == "POST":
         body = json.loads(request.body)
@@ -23,7 +21,8 @@ def book_router(request: HttpRequest):
         isbn = body.get("isbn")
         publisher = body.get("publisher")
 
-        success, detail, book = UpsertBookService(
+        success, detail, book = UpsertReviewService(
+            id=pk,
             title=title,
             author=author,
             publication_year=publication_year,
@@ -35,5 +34,3 @@ def book_router(request: HttpRequest):
             {"success": success, "detail": detail, "book": book},
             status=200 if success else 400,
         )
-
-    return HttpResponse(status=405)
