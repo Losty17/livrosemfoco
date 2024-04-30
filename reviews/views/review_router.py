@@ -2,6 +2,7 @@ from django.http import HttpRequest
 import json
 from django.http import HttpRequest, HttpResponse, JsonResponse
 
+from authentication.models.sessions import Session
 from reviews.services.list_reviews import ListReviewsService
 from reviews.services.upsert_review import UpsertReviewService
 
@@ -11,7 +12,7 @@ def review_router(request: HttpRequest):
         success, detail, json_data = ListReviewsService().perform()
 
         if success:
-            return JsonResponse({"detail": detail, "books": json_data})
+            return JsonResponse({"detail": detail, "reviews": json_data})
         else:
             return JsonResponse({"detail": detail}, status=400)
 
@@ -19,17 +20,18 @@ def review_router(request: HttpRequest):
         body = json.loads(request.body)
 
         title = body.get("title")
-        author = body.get("author")
-        publication_year = body.get("publication_year")
-        isbn = body.get("isbn")
-        publisher = body.get("publisher")
+        content = body.get("content")
+        book_id = body.get("book_id")
+
+        auth_token = request.headers.get("Authorization").split(" ")[1]
+        session = Session.objects.get(session_key=auth_token)
+        user = session.user
 
         success, detail, book = UpsertReviewService(
             title=title,
-            author=author,
-            publication_year=publication_year,
-            isbn=isbn,
-            publisher=publisher,
+            content=content,
+            book_id=book_id,
+            user=user,
         ).perform()
 
         return JsonResponse(
